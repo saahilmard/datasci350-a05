@@ -1,0 +1,157 @@
+]---
+title: "WDI 2022 Exploratory Data Analysis"
+author: "Saahil Mardhekar"
+date: "2026-02-25"
+format:
+  html:
+    toc: true
+    number-sections: true
+    code-fold: true
+  pdf:
+    toc: true
+    number-sections: true
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+crossref: true
+---
+
+## Data Source
+
+This report analyzes 2022 country-level data from the World Development Indicators dataset published by the World Bank [@worldbank_wdi].
+
+## Load Data
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("data/wdi.csv")
+df.shape
+```
+
+```{python}
+df.head()
+```
+
+## Missing Data Overview
+
+```{python}
+df.isna().sum().sort_values(ascending=False)
+```
+
+---
+
+## Indicator 1: GDP per Capita
+
+```{python}
+#| label: tbl-gdp
+#| tbl-cap: "Summary statistics for GDP per capita (USD), WDI 2022."
+df[["gdp_per_capita"]].describe()
+```
+
+```{python}
+#| label: fig-gdp
+#| fig-cap: "Distribution of GDP per capita (USD), WDI 2022. Source: World Bank WDI [@worldbank_wdi]."
+
+df["gdp_per_capita"].dropna().plot(kind="hist", bins=30)
+plt.title("GDP per Capita (2022)")
+plt.xlabel("GDP per Capita (USD)")
+plt.ylabel("Count")
+plt.tight_layout()
+plt.show()
+```
+
+See Figure @fig-gdp and Table @tbl-gdp.
+
+---
+
+## Indicator 2: Life Expectancy
+
+```{python}
+#| label: tbl-life
+#| tbl-cap: "Summary statistics for life expectancy (years), WDI 2022."
+df[["life_expectancy"]].describe()
+```
+
+```{python}
+#| label: fig-life
+#| fig-cap: "Life expectancy vs GDP per capita, WDI 2022. Source: World Bank WDI [@worldbank_wdi]."
+
+sub = df[["gdp_per_capita", "life_expectancy"]].dropna()
+
+plt.scatter(sub["gdp_per_capita"], sub["life_expectancy"])
+plt.title("Life Expectancy vs GDP per Capita (2022)")
+plt.xlabel("GDP per Capita (USD)")
+plt.ylabel("Life Expectancy (years)")
+plt.tight_layout()
+plt.show()
+```
+
+See Figure @fig-life and Table @tbl-life.
+
+---
+
+## Indicator 3: Unemployment Rate
+
+```{python}
+#| label: tbl-unemp
+#| tbl-cap: "Summary statistics for unemployment rate (%), WDI 2022."
+df[["unemployment_rate"]].describe()
+```
+
+```{python}
+#| label: fig-unemp
+#| fig-cap: "Top 15 countries by unemployment rate (%), WDI 2022. Source: World Bank WDI [@worldbank_wdi]."
+
+top_unemp = (
+    df[["country", "unemployment_rate"]]
+    .dropna()
+    .sort_values("unemployment_rate", ascending=False)
+    .head(15)
+)
+
+plt.bar(top_unemp["country"], top_unemp["unemployment_rate"])
+plt.title("Top 15 Unemployment Rates (2022)")
+plt.xlabel("Country")
+plt.ylabel("Unemployment Rate (%)")
+plt.xticks(rotation=60, ha="right")
+plt.tight_layout()
+plt.show()
+```
+
+See Figure @fig-unemp and Table @tbl-unemp.
+
+---
+
+## Combined Key Statistics
+
+```{python}
+#| label: tbl-summary
+#| tbl-cap: "Key statistics for GDP per capita, life expectancy, and unemployment rate, WDI 2022."
+
+key = df[["gdp_per_capita", "life_expectancy", "unemployment_rate"]]
+
+summary = pd.DataFrame({
+    "count": key.count(),
+    "mean": key.mean(),
+    "median": key.median(),
+    "std": key.std(),
+    "min": key.min(),
+    "max": key.max()
+})
+
+summary
+```
+
+See Table @tbl-summary.
+
+---
+
+## Interpretation
+
+GDP per capita shows a strongly right-skewed distribution, indicating that a small number of countries have very high income levels relative to the majority. Life expectancy generally increases with GDP per capita, suggesting a positive association between income and health outcomes. Unemployment rates vary widely across countries and do not display a simple linear pattern with GDP per capita. These findings are based on available 2022 data from the World Development Indicators dataset [@worldbank_wdi].
+
+## References

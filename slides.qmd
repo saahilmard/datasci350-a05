@@ -1,0 +1,28 @@
+---
+title: "WDI 2022 Analysis"
+author: "Saahil Mardhekar"
+date: "2026-02-25"
+format:
+  revealjs:
+    theme: simple
+    transition: slide
+    slide-number: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## Overview
+
+- GDP per capita
+- Life expectancy
+- Unemployment rate
+
+## Load Data
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.read_csv("data/wdi.csv")
+df.shape
